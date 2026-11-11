@@ -5,14 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#163d37">
   <title>報修登記｜問題有紀錄，處理更清楚</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="報修登記">
   <link rel="stylesheet" href="./style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script defer src="./config.js"></script>
   <script defer src="./app.js"></script>
+  <script defer src="./pwa.js"></script>
 </head>
 <body>
   <header class="site-header"><a href="./" class="brand"><span class="brand-icon" aria-hidden="true">＋</span> 報修登記</a><span class="demo-label">示範系統</span></header>
   <main>
+    <div class="pwa-tools">
+      <button id="install-button" class="secondary" type="button" hidden>安裝報修登記</button>
+      <p class="install-help">加入手機主畫面：Android 使用瀏覽器「安裝應用程式」；iPhone 使用 Safari「分享 → 加入主畫面」。</p>
+    </div>
+    <p id="connection-message" class="message" role="status" aria-live="polite"></p>
+    <p id="pwa-message" class="message" role="status" aria-live="polite"></p>
     <section class="intro"><p class="eyebrow">REPAIR DESK</p><h1>發現問題，<br>從這裡開始。</h1><p>留下問題與地點，讓每一筆報修都有紀錄。</p><p class="privacy">此清單公開可見，請使用虛構姓名、地點與示範內容。</p></section>
     <div class="workspace">
       <section class="panel form-panel" aria-labelledby="form-title">

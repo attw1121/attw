@@ -61,6 +61,10 @@
     });
   }
   async function loadRequests() {
+    if (!navigator.onLine) {
+      message(listMessage, '目前離線，無法讀取最新清單。連線後請按「重新整理」。');
+      return false;
+    }
     if (loading) return false;
     loading = true;
     refreshButton.disabled = true;
@@ -80,7 +84,7 @@
       return false;
     } finally {
       loading = false;
-      refreshButton.disabled = false;
+      refreshButton.disabled = !navigator.onLine;
       list.setAttribute('aria-busy', 'false');
     }
   }
@@ -103,6 +107,10 @@
   }
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!navigator.onLine) {
+      message(formMessage, '目前離線，報修尚未送出。請保持頁面開啟，恢復連線後再送出。', 'error');
+      return;
+    }
     if (submitting) return;
     for (const field of form.querySelectorAll('input, textarea')) {
       field.setCustomValidity(field.value.trim() ? '' : '請填寫內容，不能只有空白。');
@@ -127,7 +135,7 @@
       message(formMessage, `未能確認送出成功：${error.message || '連線異常'}。內容已保留；重試前請先重新整理清單，避免重複登記。`, 'error');
     } finally {
       submitting = false;
-      submitButton.disabled = false;
+      submitButton.disabled = !navigator.onLine;
       submitButton.textContent = '送出報修 ↗';
     }
   });
