@@ -11,3 +11,9 @@
 Excel為計算快照，容量和需求比含公式；修改輸入應回網頁重算。單位：mm、kgf、kgf/cm²、kgf·cm。
 
 驗證：端距 d 與 d/2 邊界、N/d分支、ASD係數、單/雙側及拘束適用性、kgf與SI獨立換算、輸入阻擋、手機版無水平溢出、實際xlsx下載。
+
+## PWA 安裝與離線
+
+開啟 HTTPS 網頁，待頁尾顯示「離線已就緒」。Chrome／Edge 可使用安裝按鈕或瀏覽器安裝選單；iPhone／iPad 使用 Safari 分享 → 加入主畫面。首次快取完成後可離線開啟已安裝的應用程式、計算及匯出 Excel／JSON。外部規範連結需要網路，輸入資料只存於本機瀏覽器。
+
+GitHub Pages 安裝入口：https://attw1121.github.io/attw/steel-web-check/dist/ 。`manifest.webmanifest` 與 service worker 均使用相對路徑，作用範圍限於工具目錄。更新快取檔案時須遞增 `dist/sw.js` 的快取版本；使用者看到更新按鈕後可重新載入最新版。
