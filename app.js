@@ -6,6 +6,10 @@
   const formMessage = document.querySelector('#form-message');
   const listMessage = document.querySelector('#list-message');
   const list = document.querySelector('#request-list');
+  const filterButtons = document.querySelectorAll('[data-urgency]');
+  const filterMessage = document.querySelector('#filter-message');
+  let requests = [];
+  let selectedUrgency = '全部';
   const config = window.REPAIR_CONFIG;
   let client;
   let loading = false;
@@ -39,6 +43,23 @@
       list.append(card);
     }
   }
+  // 僅在已載入的清單上篩選，不發出任何額外資料庫請求。
+  function renderFilteredRequests() {
+    const visible = selectedUrgency === '全部' ? requests :
+      requests.filter((row) => row.urgency === selectedUrgency);
+    render(visible);
+    message(filterMessage, requests.length && !visible.length ?
+      `最近載入的報修中，沒有緊急程度為「${selectedUrgency}」的紀錄。` : '');
+    for (const button of filterButtons) {
+      button.setAttribute('aria-pressed', String(button.dataset.urgency === selectedUrgency));
+    }
+  }
+  for (const button of filterButtons) {
+    button.addEventListener('click', () => {
+      selectedUrgency = button.dataset.urgency;
+      renderFilteredRequests();
+    });
+  }
   async function loadRequests() {
     if (loading) return false;
     loading = true;
@@ -50,7 +71,8 @@
         .select('id,created_at,reporter_name,location,category,description,urgency,status')
         .order('created_at', { ascending: false }).order('id', { ascending: false }).limit(20);
       if (error) throw error;
-      render(data || []);
+      requests = data || [];
+      renderFilteredRequests();
       message(listMessage, data?.length ? '' : '目前還沒有報修紀錄。');
       return true;
     } catch (error) {
