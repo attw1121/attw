@@ -1,0 +1,20 @@
+(function(g){
+const defaults={code:'tw',d:400,bf:200,tw:8,tf:13,k:26,h:348,N:100,a:400,Lb:3000,Fy:2450,E:2040000,P:18000,M:0,My:2000000,rotation:'yes',relative:'free',load:'single',translation:'yes',project:'型鋼集中載重檢核',member:'B1'};
+function calculate(x){let errors=[];for(const key of ['d','bf','tw','tf','k','h','N','Lb','Fy','E','My'])if(!Number.isFinite(x[key])||x[key]<=0)errors.push(key+' 必須大於 0');for(const key of ['a','P','M'])if(!Number.isFinite(x[key])||x[key]<0)errors.push(key+' 必須大於或等於 0');if(2*x.k>=x.d||x.k<x.tf||2*x.tf>=x.d||x.tw>=x.bf||x.h>x.d-2*x.tf)errors.push('斷面幾何不合理：需 tf ≤ k < d/2、tw < bf、h ≤ d−2tf');if(Math.abs(x.h-(x.d-2*x.k))>0.01)errors.push('熱軋斷面的 h 必須等於 d−2k；請使用更新腹板淨深按鈕');if(errors.length)return {errors};
+let {d,bf,tw,tf,k,h,N,a,Lb,Fy,E,P,M,My}=x;let tai=x.code==='tw',asd=x.code==='aisc-asd',q=(h/tw)/(Lb/bf),ratio=N/d,alpha=asd?1.5:1;let cr=tai?(M<My?67600000:33800000):(alpha*M<My?6.6e6:3.3e6)/0.0980665; // kgf/cm²
+let c={d:d/10,bf:bf/10,tw:tw/10,tf:tf/10,k:k/10,h:h/10,N:N/10,a:a/10,Lb:Lb/10};let rows=[];
+function add(name,ref,rn,phi,omega,formula,sub,condition,note='',state='calc'){let cap=asd?rn/omega:phi*rn;rows.push({name,ref,rn,phi,omega,cap,ratio:P/cap,formula,sub,condition,note,state,status:state==='calc'?(P<=cap?'通過':'不通過'):state==='review'?'需另行評估':'不適用'});}
+let nearY=a<=d,Cy=nearY?2.5:5;let ry=(Cy*c.k+c.N)*Fy*c.tw;
+add('腹板局部降伏',tai?'11.2.3 · (11.2-2／3)':'J10.2 · (J10-2／3)',ry,1,1.5,'Rn = (Ck + N) Fy tw','('+Cy+' × '+c.k+' + '+c.N+') × '+Fy+' × '+c.tw+' = '+ry.toFixed(2)+' kgf', 'a '+(nearY?'≤':'>')+' d → C = '+Cy);
+let nearC=a<d/2,coef=nearC?0.4:0.8,A=nearC&&ratio>0.2?4*ratio-0.2:3*ratio;
+let rc=tai?(nearC?18:36)*c.tw**2*(1+A*(tw/tf)**1.5)*Math.sqrt((Fy/1000)*tf/tw)*1000:coef*c.tw**2*(1+A*(tw/tf)**1.5)*Math.sqrt(E*Fy*tf/tw);
+let formC=tai?'Rn = C tw² [1 + A(tw/tf)^1.5] √(Fyw tf/tw)':'Rn = C tw² [1 + A(tw/tf)^1.5] √(E Fy tf/tw)';
+add('腹板壓皺',tai?'11.2.4 · (11.2-4～6)':'J10.3 · (J10-4／5)',rc,.75,2,formC,(tai?'C = '+(nearC?18:36)+'；Fyw = '+(Fy/1000)+' tf/cm²；結果 × 1000 轉 kgf':'C = '+coef+'；E = '+E+' kgf/cm²')+'；tw = '+c.tw+' cm；tf = '+c.tf+' cm；A = '+A.toFixed(6)+'；Rn = '+rc.toFixed(2)+' kgf','a '+(nearC?'<':'≥')+' d/2；N/d = '+ratio.toFixed(4)+'；A = '+(nearC&&ratio>.2?'4N/d − 0.2':'3N/d'));
+let constrained=x.rotation==='yes',limit=constrained?2.3:1.7;let sstate=x.relative==='braced'?'na':q>limit?'na':'calc';let swhy=x.relative==='braced'?'兩翼板相對側移已拘束':q>limit?'q > '+limit+'，此極限狀態不適用':'q ≤ '+limit+'，'+(constrained?'受壓翼板有轉動拘束':'受壓翼板無轉動拘束');
+let rs=cr*c.tw**3*c.tf/c.h**2*((constrained?1:0)+.4*q**3);
+add('腹板側向挫屈',tai?'11.2.5 · (11.2-7／8)':'J10.4 · (J10-6／7)',rs,.85,1.76,'Rn = Cr tw³ tf / h² × ['+(constrained?'1 + ':'')+'0.4q³]；q = (h/tw)/(Lb/bf)','q = ('+h+'/'+tw+')/('+Lb+'/'+bf+') = '+q.toFixed(6)+'；Cr = '+cr.toFixed(2)+' kgf/cm²；Rn = '+rs.toFixed(2)+' kgf',swhy+'；'+alpha+'Mr '+(alpha*M<My?'<':'≥')+' My','Cr 依載重點彎矩與降伏彎矩比較；非整體側向扭轉挫屈檢核。',sstate);
+let endB=a<d/2,rb=tai?1100*c.tw**3*Math.sqrt(Fy/1000)/c.h*1000:24*c.tw**3*Math.sqrt(E*Fy)/c.h;rb*=endB?.5:1;
+let bstate=x.load!=='double'?'na':x.translation!=='yes'||ratio>=1?'review':'calc';
+add('腹板受壓挫屈',tai?'11.2.6 · (11.2-9)':'J10.5 · (J10-8)',rb,.9,1.67,tai?'Rn = 1100 tw³ √Fyw / h × 端部係數（tf → kgf）':'Rn = 24 tw³ √(E Fy) / h × 端部係數','tw = '+c.tw+' cm；h = '+c.h+' cm；'+(tai?'Fyw = '+Fy/1000+' tf/cm²':'E = '+E+'；Fy = '+Fy+' kgf/cm²')+'；端部係數 = '+(endB?.5:1)+'；Rn = '+rb.toFixed(2)+' kgf',x.load==='double'?'同斷面兩翼板承受等值相向壓力；a '+(endB?'<':'≥')+' d/2':'單側集中壓力，不適用','雙側受壓須有翼板平移拘束；N/d ≥ 1 或缺乏平移拘束時須另行分析。',bstate);
+let applicable=rows.filter(r=>r.state==='calc');let governing=applicable.reduce((a,b)=>b.ratio>a.ratio?b:a,applicable[0]);return {errors:[],rows,governing,q,cr,c,review:rows.some(r=>r.state==='review'),pass:applicable.every(r=>r.ratio<=1)};}
+g.SteelCalc={defaults,calculate};})(typeof window==='undefined'?globalThis:window);
