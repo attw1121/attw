@@ -28,3 +28,5 @@
 獨立工具位於 `steel-web-check/`，發布網址：https://attw1121.github.io/attw/steel-web-check/ 。使用既有 GitHub Pages 的 `main` 分支根目錄發布，無須建置。
 
 本機可在儲存庫根目錄執行 `python -m http.server 8000`，再開啟 `http://localhost:8000/steel-web-check/`。功能、計算範圍與規範見 [工具說明](steel-web-check/README.md)。
+
+[報修登記系統提案（PowerPoint）](文件/報修登記系統提案.pptx)
