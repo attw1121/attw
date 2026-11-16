@@ -1,8 +1,8 @@
 'use strict';
 // Bump this version whenever a cached application file changes.
 const PREFIX = 'web-check-' + self.registration.scope;
-const CACHE = PREFIX + 'v1';
-const ASSETS = ['./', 'index.html', 'style.css', 'calc.js', 'xlsx.js', 'app.js', 'pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const CACHE = PREFIX + 'v2';
+const ASSETS = ['./', 'index.html', 'style.css', 'zip.js', 'calc.js', 'diagram.js', 'xlsx.js', 'docx.js', 'export.js', 'app.js', 'pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
 });
