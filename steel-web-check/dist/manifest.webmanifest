@@ -2,7 +2,7 @@
   "id": "./",
   "name": "型鋼腹板檢核｜WEB / CHECK",
   "short_name": "腹板檢核",
-  "description": "型鋼集中載重腹板強度檢核、Excel 匯出與離線計算。",
+  "description": "型鋼腹板壓皺檢核（AISC 與台灣規範），Excel 與 Word 計算書匯出、離線計算。",
   "lang": "zh-Hant",
   "start_url": "./",
   "scope": "./",
