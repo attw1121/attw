@@ -29,6 +29,8 @@
 
 範例輸出：[範例計算書.xlsx](範例計算書.xlsx)、[範例計算書.docx](範例計算書.docx)。
 
+文件：[分享簡報（PowerPoint）](文件/型鋼壓皺檢核分享簡報.pptx)、[操作手冊（Word，附實際畫面）](文件/型鋼壓皺檢核操作手冊.docx)。
+
 ## 單位
 
 輸入：尺寸 mm、Fy 與 E 為 kgf/cm²、P 為 tf、M 為 tf·m、Sx 為 cm³。計算一律換算為 tf、cm（應力 tf/cm²、彎矩 tf·cm）。
